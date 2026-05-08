@@ -1,61 +1,71 @@
+# Grundlæggende ESPHome konfiguration
 esphome:
   name: esp32-cam
   friendly_name: ESP32-CAM
 
+# ESP32 board og framework valg (esp32cam har korrekt PSRAM/flash konfiguration)
 esp32:
   board: esp32cam
   framework:
     type: arduino
 
+# Aktiver PSRAM - nødvendigt for kamera billedhukommelse
 psram:
 
+# Logger niveau (DEBUG giver mere info ved fejlfinding)
 logger:
 
+# Home Assistant API med kryptering
 api:
   encryption:
     key: !secret api_encryption_key
 
+# Over-the-Air opdatering af firmware
 ota:
   - platform: esphome
 
+# WiFi forbindelse med fallback access point hvis forbindelse fejler
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  fast_connect: true
+  fast_connect: true  # Hurtig forbindelse hvis SSID allerede er kendt
   ap:
     ssid: "ESP32-CAM Fallback"
     password: !secret ap_password
 
+# Captive portal til fallback AP (gør det nemt at konfigurere WiFi)
 captive_portal:
 
+# Kamera konfiguration for AI-Thinker ESP32-CAM med OV2640 sensor
 esp32_camera:
-  external_clock:
+  external_clock:  # XCLK fra ESP32 til kamera (typisk 20MHz for OV2640)
     pin: GPIO0
     frequency: 20MHz
-  i2c_pins:
+  i2c_pins:  # I2C til sensor konfiguration (SCCB protokol)
     sda: GPIO26
     scl: GPIO27
-  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
-  vsync_pin: GPIO25
-  href_pin: GPIO23
-  pixel_clock_pin: GPIO22
-  power_down_pin: GPIO32
-  reset_pin: GPIO15
-  resolution: 800x600
-  jpeg_quality: 10
-  vertical_flip: false
-  name: My ESP32-CAM 
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]  # 8-bit parallel data bus
+  vsync_pin: GPIO25  # Vertical sync
+  href_pin: GPIO23   # Horizontal reference (HREF)
+  pixel_clock_pin: GPIO22  # PCLK fra kamera
+  power_down_pin: GPIO32  # PWDN - sæt LOW for at aktivere kamera
+  reset_pin: GPIO15       # RESET - aktiv lav reset af kamera sensor
+  resolution: 800x600    # SVGA opløsning
+  jpeg_quality: 10        # Lavere tal = bedre kvalitet (0-63)
+  vertical_flip: false    # Spejlvend billede vertikalt
+  name: My ESP32-CAM
 
-
+# Flash LED output (GPIO4 styrer den hvide LED)
 output:
   - platform: gpio
     pin: GPIO4
     id: gpio_flash
 
+# Flashlight kontrol via Home Assistant
 light:
   - platform: binary
     output: gpio_flash
     name: "Flashlight"
     id: flashlight
     icon: mdi:flashlight
-    restore_mode: ALWAYS_OFF
+    restore_mode: ALWAYS_OFF  # LED er slukket ved opstart
