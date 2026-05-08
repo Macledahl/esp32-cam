@@ -3,7 +3,7 @@ esphome:
   friendly_name: ESP32-CAM
 
 esp32:
-  board: esp32dev
+  board: esp32cam
   framework:
     type: arduino
 
@@ -40,6 +40,7 @@ esp32_camera:
   href_pin: GPIO23
   pixel_clock_pin: GPIO22
   power_down_pin: GPIO32
+  reset_pin: GPIO15
   resolution: 800x600
   jpeg_quality: 10
   vertical_flip: false
